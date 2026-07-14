@@ -211,7 +211,7 @@ if menu == "Dashboard":
     if df.empty:
         st.info("No container movement data yet. Upload data to get started.")
     else:
-        df["date"] = pd.to_datetime(df["date"])
+        df["date"] = pd.to_datetime(df["date"], format="mixed")
         df["month"] = df["date"].dt.to_period("M").astype(str)
         df["weekday"] = df["date"].dt.day_name()
 
@@ -368,7 +368,7 @@ elif menu == "Demand Forecast":
     if df.empty or len(df) < 5:
         st.warning("Upload at least 5 data points to enable forecasting.")
     else:
-        df["date"] = pd.to_datetime(df["date"])
+        df["date"] = pd.to_datetime(df["date"], format="mixed")
         df["day"] = df["date"].dt.day
         df["month"] = df["date"].dt.month
         df["dayofweek"] = df["date"].dt.dayofweek
