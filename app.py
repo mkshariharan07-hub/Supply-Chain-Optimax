@@ -186,16 +186,16 @@ with st.sidebar:
     st.markdown("---")
 
     menu = st.radio(
-        "\ud83d\udccc Navigation",
+        "Navigation",
         [
-            "\ud83d\udcca Dashboard",
-            "\ud83d\udce5 Upload Data",
-            "\ud83d\udcc8 Demand Forecast",
-            "\ud83d\udce6 Inventory & Dwell KPIs",
-            "\ud83d\ude9a Route Costing",
-            "\ud83c\udfed Transporter Rating",
-            "\ud83d\uddd1\ufe0f Data Management",
-            "\ud83d\udccb System Health",
+            "Dashboard",
+            "Upload Data",
+            "Demand Forecast",
+            "Inventory & Dwell KPIs",
+            "Route Costing",
+            "Transporter Rating",
+            "Data Management",
+            "System Health",
         ],
     )
 
@@ -204,7 +204,7 @@ with st.sidebar:
 def download_csv(df, filename):
     csv = df.to_csv(index=False)
     st.download_button(
-        label="\ud83d\udce7 Download CSV",
+        label="Download CSV",
         data=csv,
         file_name=filename,
         mime="text/csv",
@@ -213,7 +213,7 @@ def download_csv(df, filename):
 
 
 # ================= DASHBOARD =================
-if menu == "\ud83d\udcca Dashboard":
+if menu == "Dashboard":
     st.title("\ud83d\udcca Port Operations Dashboard")
 
     df = pd.read_sql("SELECT * FROM container_movement ORDER BY date", conn)
@@ -242,7 +242,7 @@ if menu == "\ud83d\udcca Dashboard":
         st.markdown("---")
 
         # --- Charts ---
-        tab1, tab2, tab3 = st.tabs(["\ud83d\udcc8 Trend", "\ud83d\udcc5 Monthly", "\ud83d\udcca Weekday"])
+        tab1, tab2, tab3 = st.tabs(["Trend", "Monthly", "Weekday"])
 
         with tab1:
             fig = px.area(
@@ -312,15 +312,15 @@ if menu == "\ud83d\udcca Dashboard":
 
 
 # ================= UPLOAD =================
-elif menu == "\ud83d\udce5 Upload Data":
+elif menu == "Upload Data":
     st.title("\ud83d\udce5 Upload Container Throughput Data")
 
-    tab_upload, tab_manual = st.tabs(["\ud83d\udcc1 CSV Upload", "\u270f\ufe0f Manual Entry"])
+    tab_upload, tab_manual = st.tabs(["CSV Upload", "Manual Entry"])
 
     with tab_upload:
         with st.form("upload_form"):
             file = st.file_uploader("Upload CSV file with columns: `date`, `teus`", type=["csv"])
-            upload_submitted = st.form_submit_button("\ud83d\udce5 Upload & Save", use_container_width=True)
+            upload_submitted = st.form_submit_button("Upload & Save", use_container_width=True)
 
             if upload_submitted and file:
                 try:
@@ -358,7 +358,7 @@ elif menu == "\ud83d\udce5 Upload Data":
                 entry_date = st.date_input("Date", value=datetime.now().date())
             with col_b:
                 entry_teus = st.number_input("TEUs", min_value=0, value=0)
-            manual_submitted = st.form_submit_button("\ud83d\udcbe Save Entry", use_container_width=True)
+            manual_submitted = st.form_submit_button("Save Entry", use_container_width=True)
 
             if manual_submitted:
                 try:
@@ -375,7 +375,7 @@ elif menu == "\ud83d\udce5 Upload Data":
 
 
 # ================= DEMAND FORECAST =================
-elif menu == "\ud83d\udcc8 Demand Forecast":
+elif menu == "Demand Forecast":
     st.title("\ud83d\udcc8 Container Demand Forecast")
 
     df = pd.read_sql("SELECT * FROM container_movement ORDER BY date", conn)
@@ -484,10 +484,10 @@ elif menu == "\ud83d\udcc8 Demand Forecast":
 
 
 # ================= INVENTORY & DWELL KPIs =================
-elif menu == "\ud83d\udce6 Inventory & Dwell KPIs":
+elif menu == "Inventory & Dwell KPIs":
     st.title("\ud83d\udce6 Inventory & Dwell Time KPIs")
 
-    tab_calc, tab_sim = st.tabs(["\ud83d\udcca KPI Calculator", "\ud83e\uddee What-If Simulation"])
+    tab_calc, tab_sim = st.tabs(["KPI Calculator", "What-If Simulation"])
 
     with tab_calc:
         with st.form("kpi_form"):
@@ -499,7 +499,7 @@ elif menu == "\ud83d\udce6 Inventory & Dwell KPIs":
             with col3:
                 dwell_time = st.number_input("Avg Dwell Time (days)", min_value=1, value=5)
 
-            kpi_submitted = st.form_submit_button("\ud83d\udcc8 Calculate KPIs", use_container_width=True)
+            kpi_submitted = st.form_submit_button("Calculate KPIs", use_container_width=True)
 
         if kpi_submitted:
             doi = avg_inventory / (annual_teus / 365)
@@ -548,7 +548,7 @@ elif menu == "\ud83d\udce6 Inventory & Dwell KPIs":
             sim_inv = st.slider("Simulated Avg Inventory", 100, 5000, 500, step=50)
             sim_teus = st.slider("Simulated Annual TEUs", 10000, 200000, 50000, step=5000)
             sim_dwell = st.slider("Simulated Dwell Time (days)", 1, 15, 5)
-            sim_submitted = st.form_submit_button("\ud83e\uddee Run Simulation", use_container_width=True)
+            sim_submitted = st.form_submit_button("Run Simulation", use_container_width=True)
 
         if sim_submitted:
             scenarios = []
@@ -567,10 +567,10 @@ elif menu == "\ud83d\udce6 Inventory & Dwell KPIs":
 
 
 # ================= ROUTE COSTING =================
-elif menu == "\ud83d\ude9a Route Costing":
+elif menu == "Route Costing":
     st.title("\ud83d\ude9a Customer to Warehouse Route Costing")
 
-    tab_new, tab_analytics, tab_compare = st.tabs(["\u270f\ufe0f New Route", "\ud83d\udcca Analytics", "\ud83d\udd0d Compare Routes"])
+    tab_new, tab_analytics, tab_compare = st.tabs(["New Route", "Analytics", "Compare Routes"])
 
     with tab_new:
         with st.form("route_form"):
@@ -586,7 +586,7 @@ elif menu == "\ud83d\ude9a Route Costing":
             with col4:
                 cost_per_km = st.number_input("Cost per km", min_value=0.1, value=60.0, step=1.0)
 
-            route_submitted = st.form_submit_button("\ud83d\udcc8 Calculate & Save Route", use_container_width=True)
+            route_submitted = st.form_submit_button("Calculate & Save Route", use_container_width=True)
 
         if route_submitted:
             total_cost = distance_km * cost_per_km
@@ -654,10 +654,10 @@ elif menu == "\ud83d\ude9a Route Costing":
 
 
 # ================= TRANSPORTER RATING =================
-elif menu == "\ud83c\udfed Transporter Rating":
+elif menu == "Transporter Rating":
     st.title("\ud83c\udfed Transporter Evaluation")
 
-    tab_add, tab_rank, tab_radar = st.tabs(["\u270f\ufe0f Add Transporter", "\ud83c\udfc6 Leaderboard", "\ud83e\udde0 Comparison"])
+    tab_add, tab_rank, tab_radar = st.tabs(["Add Transporter", "Leaderboard", "Comparison"])
 
     with tab_add:
         with st.form("transporter_form"):
@@ -670,7 +670,7 @@ elif menu == "\ud83c\udfed Transporter Rating":
             with col3:
                 speed = st.slider("Delivery Speed", 1, 10, 5)
 
-            t_submitted = st.form_submit_button("\ud83d\udcbe Save Transporter", use_container_width=True)
+            t_submitted = st.form_submit_button("Save Transporter", use_container_width=True)
 
         if t_submitted:
             if not name.strip():
@@ -747,14 +747,14 @@ elif menu == "\ud83c\udfed Transporter Rating":
 
 
 # ================= DATA MANAGEMENT =================
-elif menu == "\ud83d\udd11\ufe0f Data Management":
+elif menu == "Data Management":
     st.title("\ud83d\udd11\ufe0f Data Management")
 
     tab_cm, tab_tr, tab_rt, tab_log = st.tabs([
-        "\ud83d\udce6 Container Data",
-        "\ud83c\udfed Transporters",
-        "\ud83d\ude9a Routes",
-        "\ud83d\udccb Activity Log",
+        "Container Data",
+        "Transporters",
+        "Routes",
+        "Activity Log",
     ])
 
     with tab_cm:
@@ -764,12 +764,12 @@ elif menu == "\ud83d\udd11\ufe0f Data Management":
         else:
             st.dataframe(df, use_container_width=True)
             del_id = st.number_input("Enter ID to delete", min_value=1, key="del_cm")
-            if st.button("\ud83d\udeae Delete Record", key="btn_del_cm"):
+            if st.button("Delete Record", key="btn_del_cm"):
                 conn.execute("DELETE FROM container_movement WHERE id = ?", (int(del_id),))
                 conn.commit()
                 st.toast("Record deleted", icon="\ud83d\udeae")
                 st.rerun()
-            if st.button("\u26a0\ufe0f Clear All Container Data", key="clear_cm"):
+            if st.button("Clear All Container Data", key="clear_cm"):
                 conn.execute("DELETE FROM container_movement")
                 conn.commit()
                 st.toast("All container data cleared", icon="\ud83d\udeae")
@@ -782,7 +782,7 @@ elif menu == "\ud83d\udd11\ufe0f Data Management":
         else:
             st.dataframe(tdf, use_container_width=True)
             del_id = st.number_input("Enter ID to delete", min_value=1, key="del_tr")
-            if st.button("\ud83d\udeae Delete Transporter", key="btn_del_tr"):
+            if st.button("Delete Transporter", key="btn_del_tr"):
                 conn.execute("DELETE FROM transporters WHERE id = ?", (int(del_id),))
                 conn.commit()
                 st.toast("Transporter deleted", icon="\ud83d\udeae")
@@ -795,7 +795,7 @@ elif menu == "\ud83d\udd11\ufe0f Data Management":
         else:
             st.dataframe(rdf, use_container_width=True)
             del_id = st.number_input("Enter ID to delete", min_value=1, key="del_rt")
-            if st.button("\ud83d\udeae Delete Route", key="btn_del_rt"):
+            if st.button("Delete Route", key="btn_del_rt"):
                 conn.execute("DELETE FROM routes WHERE id = ?", (int(del_id),))
                 conn.commit()
                 st.toast("Route deleted", icon="\ud83d\udeae")
@@ -811,7 +811,7 @@ elif menu == "\ud83d\udd11\ufe0f Data Management":
 
 
 # ================= SYSTEM HEALTH =================
-elif menu == "\ud83d\udccB System Health":
+elif menu == "System Health":
     st.title("\ud83d\udccb System Health")
 
     col1, col2, col3, col4 = st.columns(4)
