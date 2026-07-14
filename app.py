@@ -15,7 +15,7 @@ import os
 # ================= PAGE CONFIG =================
 st.set_page_config(
     page_title="Supply Chain Optimax",
-    page_icon="\u2693",
+    page_icon=":anchor:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -23,11 +23,9 @@ st.set_page_config(
 # ================= CUSTOM CSS =================
 st.markdown("""
 <style>
-    /* Main container */
     .stApp {
         font-family: 'Segoe UI', sans-serif;
     }
-    /* Metric cards */
     div[data-testid="stMetric"] {
         background: linear-gradient(135deg, #1A1F2E 0%, #0E1117 100%);
         border: 1px solid #00B4D8;
@@ -45,7 +43,6 @@ st.markdown("""
         color: #FAFAFA !important;
         font-weight: 700 !important;
     }
-    /* Sidebar */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0A1628 0%, #0E1117 100%);
         border-right: 1px solid #1E3A5F;
@@ -54,7 +51,6 @@ st.markdown("""
         color: #CAF0F8 !important;
         font-size: 0.9rem;
     }
-    /* Headers */
     h1, h2, h3 {
         color: #CAF0F8 !important;
     }
@@ -62,7 +58,6 @@ st.markdown("""
         border-bottom: 2px solid #00B4D8;
         padding-bottom: 8px;
     }
-    /* Buttons */
     div[data-testid="stButton"] > button {
         background: linear-gradient(135deg, #0077B6 0%, #00B4D8 100%);
         color: white;
@@ -77,25 +72,21 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(0, 180, 216, 0.4);
         transform: translateY(-1px);
     }
-    /* Forms */
     div[data-testid="stForm"] {
         border: 1px solid #1E3A5F;
         border-radius: 12px;
         padding: 20px;
         background: rgba(26, 31, 46, 0.5);
     }
-    /* Dataframe styling */
     div[data-testid="stDataFrame"] {
         border: 1px solid #1E3A5F;
         border-radius: 8px;
         overflow: hidden;
     }
-    /* Success/Warning/Error boxes */
     div[data-testid="stAlert"] {
         border-radius: 8px;
         border-left-width: 4px;
     }
-    /* Tabs */
     button[data-baseweb="tab"] {
         color: #90E0EF !important;
         font-weight: 500;
@@ -104,7 +95,6 @@ st.markdown("""
         color: #00B4D8 !important;
         border-bottom-color: #00B4D8 !important;
     }
-    /* Footer */
     .footer {
         text-align: center;
         padding: 20px;
@@ -182,7 +172,7 @@ def log_activity(conn, user, action, details=""):
 conn = get_db_connection()
 
 with st.sidebar:
-    st.markdown("### \u2693 Supply Chain Optimax")
+    st.markdown("### Supply Chain Optimax")
     st.markdown("---")
 
     menu = st.radio(
@@ -214,18 +204,17 @@ def download_csv(df, filename):
 
 # ================= DASHBOARD =================
 if menu == "Dashboard":
-    st.title("\ud83d\udcca Port Operations Dashboard")
+    st.title("Port Operations Dashboard")
 
     df = pd.read_sql("SELECT * FROM container_movement ORDER BY date", conn)
 
     if df.empty:
-        st.info("\ud83d\udce5 No container movement data yet. Upload data to get started.")
+        st.info("No container movement data yet. Upload data to get started.")
     else:
         df["date"] = pd.to_datetime(df["date"])
         df["month"] = df["date"].dt.to_period("M").astype(str)
         df["weekday"] = df["date"].dt.day_name()
 
-        # --- KPI Row ---
         c1, c2, c3, c4, c5 = st.columns(5)
         total_teus = int(df["teus"].sum())
         avg_daily = df["teus"].mean()
@@ -233,15 +222,14 @@ if menu == "Dashboard":
         max_day = df.loc[df["teus"].idxmax()]
         min_day = df.loc[df["teus"].idxmin()]
 
-        c1.metric("\ud83d\udce6 Total TEUs", f"{total_teus:,}")
-        c2.metric("\ud83d\udcc8 Avg Daily TEUs", f"{avg_daily:,.0f}")
-        c3.metric("\ud83d\udcc9 Volatility (\u03c3)", f"{std_daily:,.1f}")
-        c4.metric("\ud83d\udcc5 Peak Day", f"{max_day['teus']:,}", max_day["date"].strftime("%d %b"))
-        c5.metric("\ud83d\udcc1 Lowest Day", f"{min_day['teus']:,}", min_day["date"].strftime("%d %b"))
+        c1.metric("Total TEUs", f"{total_teus:,}")
+        c2.metric("Avg Daily TEUs", f"{avg_daily:,.0f}")
+        c3.metric("Volatility (std)", f"{std_daily:,.1f}")
+        c4.metric("Peak Day", f"{max_day['teus']:,}", max_day["date"].strftime("%d %b"))
+        c5.metric("Lowest Day", f"{min_day['teus']:,}", min_day["date"].strftime("%d %b"))
 
         st.markdown("---")
 
-        # --- Charts ---
         tab1, tab2, tab3 = st.tabs(["Trend", "Monthly", "Weekday"])
 
         with tab1:
@@ -292,28 +280,26 @@ if menu == "Dashboard":
             )
             st.plotly_chart(fig3, use_container_width=True)
 
-        # --- Summary Table ---
-        with st.expander("\ud83d\udcca Data Summary"):
+        with st.expander("Data Summary"):
             st.dataframe(df[["date", "teus"]].describe().round(1), use_container_width=True)
             download_csv(df, "container_data.csv")
 
-    # --- Quick Stats from other tables ---
     st.markdown("---")
-    st.subheader("\ud83d\udcca Quick Overview")
+    st.subheader("Quick Overview")
     qc1, qc2, qc3 = st.columns(3)
 
     route_count = pd.read_sql("SELECT COUNT(*) as cnt FROM routes", conn).iloc[0, 0]
     trans_count = pd.read_sql("SELECT COUNT(*) as cnt FROM transporters", conn).iloc[0, 0]
     data_count = len(df) if not df.empty else 0
 
-    qc1.metric("\ud83d\ude9a Saved Routes", route_count)
-    qc2.metric("\ud83c\udfed Transporters", trans_count)
-    qc3.metric("\ud83d\udcc5 Data Points", data_count)
+    qc1.metric("Saved Routes", route_count)
+    qc2.metric("Transporters", trans_count)
+    qc3.metric("Data Points", data_count)
 
 
 # ================= UPLOAD =================
 elif menu == "Upload Data":
-    st.title("\ud83d\udce5 Upload Container Throughput Data")
+    st.title("Upload Container Throughput Data")
 
     tab_upload, tab_manual = st.tabs(["CSV Upload", "Manual Entry"])
 
@@ -339,16 +325,15 @@ elif menu == "Upload Data":
                             except Exception:
                                 continue
                         conn.commit()
-                        st.toast(f"Saved {saved} records successfully!", icon="\u2705")
+                        st.toast(f"Saved {saved} records successfully!")
                         log_activity(conn, "user", "upload_csv", f"records={saved}")
                         st.rerun()
                 except Exception as e:
                     st.error(f"Error reading CSV: {e}")
 
-        # Preview uploaded data
         existing = pd.read_sql("SELECT * FROM container_movement ORDER BY date DESC LIMIT 10", conn)
         if not existing.empty:
-            st.subheader("\ud83d\udcc4 Recent Records")
+            st.subheader("Recent Records")
             st.dataframe(existing, use_container_width=True)
 
     with tab_manual:
@@ -367,7 +352,7 @@ elif menu == "Upload Data":
                         (entry_date.isoformat(), int(entry_teus)),
                     )
                     conn.commit()
-                    st.toast(f"Entry saved for {entry_date}", icon="\u2705")
+                    st.toast(f"Entry saved for {entry_date}")
                     log_activity(conn, "user", "manual_entry", f"date={entry_date}")
                     st.rerun()
                 except Exception as e:
@@ -376,12 +361,12 @@ elif menu == "Upload Data":
 
 # ================= DEMAND FORECAST =================
 elif menu == "Demand Forecast":
-    st.title("\ud83d\udcc8 Container Demand Forecast")
+    st.title("Container Demand Forecast")
 
     df = pd.read_sql("SELECT * FROM container_movement ORDER BY date", conn)
 
     if df.empty or len(df) < 5:
-        st.warning("\ud83d\udce5 Upload at least 5 data points to enable forecasting.")
+        st.warning("Upload at least 5 data points to enable forecasting.")
     else:
         df["date"] = pd.to_datetime(df["date"])
         df["day"] = df["date"].dt.day
@@ -389,7 +374,7 @@ elif menu == "Demand Forecast":
         df["dayofweek"] = df["date"].dt.dayofweek
         df["dayofyear"] = df["date"].dt.dayofyear
 
-        with st.spinner("\ud83e\uddee Training models..."):
+        with st.spinner("Training models..."):
             features = ["day", "month", "dayofweek", "dayofyear"]
             X = df[features]
             y = df["teus"]
@@ -413,24 +398,22 @@ elif menu == "Demand Forecast":
             best_model = rf if rf_mae < lr_mae else lr
             best_name = "Random Forest" if best_model == rf else "Linear Regression"
 
-        # --- Model Comparison ---
-        st.subheader("\ud83e\uddee Model Performance")
+        st.subheader("Model Performance")
         mc1, mc2 = st.columns(2)
         with mc1:
             st.markdown("**Random Forest**")
             st.metric("MAE", f"{rf_mae:.1f}")
-            st.metric("R\u00b2 Score", f"{rf_r2:.3f}")
+            st.metric("R2 Score", f"{rf_r2:.3f}")
         with mc2:
             st.markdown("**Linear Regression**")
             st.metric("MAE", f"{lr_mae:.1f}")
-            st.metric("R\u00b2 Score", f"{lr_r2:.3f}")
+            st.metric("R2 Score", f"{lr_r2:.3f}")
 
-        st.success(f"\ud83c\udfc6 Best Model: **{best_name}** (MAE: {min(rf_mae, lr_mae):.1f})")
+        st.success(f"Best Model: **{best_name}** (MAE: {min(rf_mae, lr_mae):.1f})")
 
         st.markdown("---")
 
-        # --- Forecast ---
-        st.subheader("\ud83d\udd2e Forecast")
+        st.subheader("Forecast")
         days = st.slider("Forecast Horizon (days)", 7, 90, 30)
         last_date = df["date"].max()
 
@@ -442,7 +425,6 @@ elif menu == "Demand Forecast":
 
         fdf = pd.DataFrame(future)
 
-        # Confidence band (simple std-based)
         residual_std = y_test - best_model.predict(X_test)
         std_val = residual_std.std()
 
@@ -478,14 +460,14 @@ elif menu == "Demand Forecast":
         )
         st.plotly_chart(fig, use_container_width=True)
 
-        with st.expander("\ud83d\udcca Forecast Data"):
+        with st.expander("Forecast Data"):
             st.dataframe(fdf, use_container_width=True)
             download_csv(fdf, "forecast_data.csv")
 
 
 # ================= INVENTORY & DWELL KPIs =================
 elif menu == "Inventory & Dwell KPIs":
-    st.title("\ud83d\udce6 Inventory & Dwell Time KPIs")
+    st.title("Inventory & Dwell Time KPIs")
 
     tab_calc, tab_sim = st.tabs(["KPI Calculator", "What-If Simulation"])
 
@@ -507,18 +489,17 @@ elif menu == "Inventory & Dwell KPIs":
             yard_utilization = avg_inventory / (daily_throughput * dwell_time) * 100 if daily_throughput * dwell_time > 0 else 0
 
             k1, k2, k3 = st.columns(3)
-            k1.metric("\ud83d\udcc5 Days of Inventory", f"{doi:.1f} days")
-            k2.metric("\ud83d\udcc8 Daily Throughput", f"{daily_throughput:,.0f}")
-            k3.metric("\ud83c\udfed Yard Utilization", f"{yard_utilization:.1f}%")
+            k1.metric("Days of Inventory", f"{doi:.1f} days")
+            k2.metric("Daily Throughput", f"{daily_throughput:,.0f}")
+            k3.metric("Yard Utilization", f"{yard_utilization:.1f}%")
 
             if dwell_time > 6:
-                st.error("\u26a0\ufe0f High dwell time detected \u2014 congestion risk! Consider expediting clearance.")
+                st.error("High dwell time detected -- congestion risk! Consider expediting clearance.")
             elif dwell_time > 4:
-                st.warning("\ud83d\udcc1 Moderate dwell time \u2014 monitor closely for trends.")
+                st.warning("Moderate dwell time -- monitor closely for trends.")
             else:
-                st.success("\u2705 Dwell time is under control. Operations running smoothly.")
+                st.success("Dwell time is under control. Operations running smoothly.")
 
-            # Gauge chart
             fig = go.Figure(go.Indicator(
                 mode="gauge+number+delta",
                 value=dwell_time,
@@ -543,7 +524,7 @@ elif menu == "Inventory & Dwell KPIs":
             st.plotly_chart(fig, use_container_width=True)
 
     with tab_sim:
-        st.markdown("### \ud83e\uddee What-If Scenario Analysis")
+        st.markdown("### What-If Scenario Analysis")
         with st.form("sim_form"):
             sim_inv = st.slider("Simulated Avg Inventory", 100, 5000, 500, step=50)
             sim_teus = st.slider("Simulated Annual TEUs", 10000, 200000, 50000, step=5000)
@@ -568,7 +549,7 @@ elif menu == "Inventory & Dwell KPIs":
 
 # ================= ROUTE COSTING =================
 elif menu == "Route Costing":
-    st.title("\ud83d\ude9a Customer to Warehouse Route Costing")
+    st.title("Customer to Warehouse Route Costing")
 
     tab_new, tab_analytics, tab_compare = st.tabs(["New Route", "Analytics", "Compare Routes"])
 
@@ -591,15 +572,15 @@ elif menu == "Route Costing":
         if route_submitted:
             total_cost = distance_km * cost_per_km
             c1, c2 = st.columns(2)
-            c1.metric("\ud83d\udcb0 Total Transport Cost", f"\u20b9 {total_cost:,.2f}")
-            c2.metric("\ud83d\udee1\ufe0f Cost per km", f"\u20b9 {cost_per_km:,.2f}")
+            c1.metric("Total Transport Cost", f"{total_cost:,.2f}")
+            c2.metric("Cost per km", f"{cost_per_km:,.2f}")
 
             conn.execute(
                 "INSERT INTO routes(customer_location, warehouse_location, distance_km, cost_per_km, total_cost) VALUES (?,?,?,?,?)",
                 (customer_location, warehouse_location, distance_km, cost_per_km, total_cost),
             )
             conn.commit()
-            st.toast("Route saved successfully!", icon="\u2705")
+            st.toast("Route saved successfully!")
             log_activity(conn, "user", "add_route", f"{customer_location} -> {warehouse_location}")
             st.rerun()
 
@@ -609,10 +590,10 @@ elif menu == "Route Costing":
             st.info("No routes saved yet.")
         else:
             k1, k2, k3, k4 = st.columns(4)
-            k1.metric("\ud83d\ude9a Total Routes", len(rdf))
-            k2.metric("\ud83d\udcb0 Avg Cost", f"\u20b9 {rdf['total_cost'].mean():,.0f}")
-            k3.metric("\ud83c\udfcf Max Distance", f"{rdf['distance_km'].max():.0f} km")
-            k4.metric("\ud83d\udcc1 Min Cost", f"\u20b9 {rdf['total_cost'].min():,.0f}")
+            k1.metric("Total Routes", len(rdf))
+            k2.metric("Avg Cost", f"{rdf['total_cost'].mean():,.0f}")
+            k3.metric("Max Distance", f"{rdf['distance_km'].max():.0f} km")
+            k4.metric("Min Cost", f"{rdf['total_cost'].min():,.0f}")
 
             fig = px.bar(
                 rdf, x=rdf.index, y="total_cost",
@@ -624,7 +605,7 @@ elif menu == "Route Costing":
             fig.update_layout(template="plotly_dark", xaxis_title="Route", yaxis_title="Total Cost", margin=dict(l=0, r=0, t=40, b=0), coloraxis_showscale=False)
             st.plotly_chart(fig, use_container_width=True)
 
-            with st.expander("\ud83d\udcca All Saved Routes"):
+            with st.expander("All Saved Routes"):
                 st.dataframe(rdf, use_container_width=True)
                 download_csv(rdf, "routes_data.csv")
 
@@ -633,7 +614,7 @@ elif menu == "Route Costing":
         if len(rdf) < 2:
             st.info("Add at least 2 routes to compare.")
         else:
-            st.markdown("### \ud83d\udd0d Route Comparison")
+            st.markdown("### Route Comparison")
             options = st.multiselect(
                 "Select routes to compare",
                 options=rdf.index.tolist(),
@@ -655,7 +636,7 @@ elif menu == "Route Costing":
 
 # ================= TRANSPORTER RATING =================
 elif menu == "Transporter Rating":
-    st.title("\ud83c\udfed Transporter Evaluation")
+    st.title("Transporter Evaluation")
 
     tab_add, tab_rank, tab_radar = st.tabs(["Add Transporter", "Leaderboard", "Comparison"])
 
@@ -682,7 +663,7 @@ elif menu == "Transporter Rating":
                     (name.strip(), cost, reliability, speed),
                 )
                 conn.commit()
-                st.toast(f"Transporter '{name}' saved! Score: {score:.1f}/10", icon="\u2705")
+                st.toast(f"Transporter '{name}' saved! Score: {score:.1f}/10")
                 log_activity(conn, "user", "add_transporter", name)
                 st.rerun()
 
@@ -694,10 +675,16 @@ elif menu == "Transporter Rating":
             tdf["Score"] = tdf[["cost", "reliability", "speed"]].mean(axis=1).round(1)
             tdf = tdf.sort_values("Score", ascending=False).reset_index(drop=True)
 
-            # Leaderboard
-            st.subheader("\ud83c\udfc6 Transporter Leaderboard")
+            st.subheader("Transporter Leaderboard")
             for i, row in tdf.iterrows():
-                medal = "\ud83e\udd47" if i == 0 else "\ud83e\udd48" if i == 1 else "\ud83e\udd49" if i == 2 else f"#{i+1}"
+                if i == 0:
+                    medal = "1st"
+                elif i == 1:
+                    medal = "2nd"
+                elif i == 2:
+                    medal = "3rd"
+                else:
+                    medal = f"#{i+1}"
                 cols = st.columns([1, 3, 1, 1, 1, 1])
                 cols[0].markdown(f"### {medal}")
                 cols[1].markdown(f"**{row['name']}**")
@@ -707,9 +694,9 @@ elif menu == "Transporter Rating":
                 cols[5].metric("Score", row["Score"])
 
             if len(tdf) > 0:
-                st.success(f"\u2705 Recommended Transporter: **{tdf.iloc[0]['name']}** (Score: {tdf.iloc[0]['Score']})")
+                st.success(f"Recommended Transporter: **{tdf.iloc[0]['name']}** (Score: {tdf.iloc[0]['Score']})")
 
-            with st.expander("\ud83d\udcca Full Data"):
+            with st.expander("Full Data"):
                 st.dataframe(tdf, use_container_width=True)
                 download_csv(tdf, "transporters.csv")
 
@@ -718,7 +705,7 @@ elif menu == "Transporter Rating":
         if len(tdf) < 2:
             st.info("Add at least 2 transporters for comparison.")
         else:
-            st.subheader("\ud83e\udde0 Radar Comparison")
+            st.subheader("Radar Comparison")
             selected = st.multiselect(
                 "Select transporters",
                 options=tdf["name"].tolist(),
@@ -726,13 +713,13 @@ elif menu == "Transporter Rating":
             )
             if selected:
                 fig = go.Figure()
-                for name in selected:
-                    row = tdf[tdf["name"] == name].iloc[0]
+                for sel_name in selected:
+                    row = tdf[tdf["name"] == sel_name].iloc[0]
                     fig.add_trace(go.Scatterpolar(
                         r=[row["cost"], row["reliability"], row["speed"], row["cost"]],
                         theta=["Cost Efficiency", "Reliability", "Speed", "Cost Efficiency"],
                         fill="toself",
-                        name=name,
+                        name=sel_name,
                     ))
                 fig.update_layout(
                     template="plotly_dark",
@@ -748,7 +735,7 @@ elif menu == "Transporter Rating":
 
 # ================= DATA MANAGEMENT =================
 elif menu == "Data Management":
-    st.title("\ud83d\udd11\ufe0f Data Management")
+    st.title("Data Management")
 
     tab_cm, tab_tr, tab_rt, tab_log = st.tabs([
         "Container Data",
@@ -767,12 +754,12 @@ elif menu == "Data Management":
             if st.button("Delete Record", key="btn_del_cm"):
                 conn.execute("DELETE FROM container_movement WHERE id = ?", (int(del_id),))
                 conn.commit()
-                st.toast("Record deleted", icon="\ud83d\udeae")
+                st.toast("Record deleted")
                 st.rerun()
             if st.button("Clear All Container Data", key="clear_cm"):
                 conn.execute("DELETE FROM container_movement")
                 conn.commit()
-                st.toast("All container data cleared", icon="\ud83d\udeae")
+                st.toast("All container data cleared")
                 st.rerun()
 
     with tab_tr:
@@ -785,7 +772,7 @@ elif menu == "Data Management":
             if st.button("Delete Transporter", key="btn_del_tr"):
                 conn.execute("DELETE FROM transporters WHERE id = ?", (int(del_id),))
                 conn.commit()
-                st.toast("Transporter deleted", icon="\ud83d\udeae")
+                st.toast("Transporter deleted")
                 st.rerun()
 
     with tab_rt:
@@ -798,7 +785,7 @@ elif menu == "Data Management":
             if st.button("Delete Route", key="btn_del_rt"):
                 conn.execute("DELETE FROM routes WHERE id = ?", (int(del_id),))
                 conn.commit()
-                st.toast("Route deleted", icon="\ud83d\udeae")
+                st.toast("Route deleted")
                 st.rerun()
 
     with tab_log:
@@ -812,7 +799,7 @@ elif menu == "Data Management":
 
 # ================= SYSTEM HEALTH =================
 elif menu == "System Health":
-    st.title("\ud83d\udccb System Health")
+    st.title("System Health")
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -821,29 +808,26 @@ elif menu == "System Health":
     rt_count = pd.read_sql("SELECT COUNT(*) as c FROM routes", conn).iloc[0, 0]
     log_count = pd.read_sql("SELECT COUNT(*) as c FROM activity_log", conn).iloc[0, 0]
 
-    col1.metric("\ud83d\udce6 Container Records", cm_count)
-    col2.metric("\ud83c\udfed Transporters", tr_count)
-    col3.metric("\ud83d\ude9a Routes", rt_count)
-    col4.metric("\ud83d\udccb Activity Logs", log_count)
+    col1.metric("Container Records", cm_count)
+    col2.metric("Transporters", tr_count)
+    col3.metric("Routes", rt_count)
+    col4.metric("Activity Logs", log_count)
 
     st.markdown("---")
 
-    # DB file size
     db_size = os.path.getsize("optimax.db") / 1024 if os.path.exists("optimax.db") else 0
-    st.metric("\ud83d\udcbe Database Size", f"{db_size:.1f} KB")
+    st.metric("Database Size", f"{db_size:.1f} KB")
 
-    # Recent activity
-    st.subheader("\ud83d\udd50 Recent Activity")
+    st.subheader("Recent Activity")
     recent = pd.read_sql("SELECT * FROM activity_log ORDER BY timestamp DESC LIMIT 10", conn)
     if recent.empty:
         st.info("No activity yet.")
     else:
         st.dataframe(recent, use_container_width=True)
 
-    # Data range
     date_range = pd.read_sql("SELECT MIN(date) as min_d, MAX(date) as max_d FROM container_movement", conn)
     if date_range.iloc[0]["min_d"]:
-        st.info(f"\ud83d\udcc5 Data range: {date_range.iloc[0]['min_d']} to {date_range.iloc[0]['max_d']}")
+        st.info(f"Data range: {date_range.iloc[0]['min_d']} to {date_range.iloc[0]['max_d']}")
 
 
 # ================= FOOTER =================
