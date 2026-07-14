@@ -420,7 +420,7 @@ elif menu == "Demand Forecast":
         future = []
         for i in range(1, days + 1):
             d = last_date + timedelta(days=i)
-            pred = best_model.predict([[d.day, d.month, d.dayofweek(), d.timetuple().tm_yday]])[0]
+            pred = best_model.predict([[d.day, d.month, d.dayofweek, d.dayofyear]])[0]
             future.append({"Date": d, "Forecast TEUs": max(0, int(pred))})
 
         fdf = pd.DataFrame(future)
