@@ -242,55 +242,55 @@ if menu == "\ud83d\udcca Dashboard":
         st.markdown("---")
 
         # --- Charts ---
-        tab1, tab2, tab3 = st.tabs(["\ud83d\udcc8 Trend", "\ud83d\udcc5 Monthly", "\ud83d\udcca Weekday"]):
+        tab1, tab2, tab3 = st.tabs(["\ud83d\udcc8 Trend", "\ud83d\udcc5 Monthly", "\ud83d\udcca Weekday"])
 
-            with tab1:
-                fig = px.area(
-                    df, x="date", y="teus",
-                    title="Container Throughput Over Time",
-                    color_discrete_sequence=["#00B4D8"],
-                )
-                fig.update_layout(
-                    template="plotly_dark",
-                    xaxis_title="Date", yaxis_title="TEUs",
-                    hovermode="x unified",
-                    margin=dict(l=0, r=0, t=40, b=0),
-                )
-                fig.update_traces(fillcolor="rgba(0,180,216,0.2)", line=dict(width=2))
-                st.plotly_chart(fig, use_container_width=True)
+        with tab1:
+            fig = px.area(
+                df, x="date", y="teus",
+                title="Container Throughput Over Time",
+                color_discrete_sequence=["#00B4D8"],
+            )
+            fig.update_layout(
+                template="plotly_dark",
+                xaxis_title="Date", yaxis_title="TEUs",
+                hovermode="x unified",
+                margin=dict(l=0, r=0, t=40, b=0),
+            )
+            fig.update_traces(fillcolor="rgba(0,180,216,0.2)", line=dict(width=2))
+            st.plotly_chart(fig, use_container_width=True)
 
-            with tab2:
-                monthly = df.groupby("month")["teus"].sum().reset_index()
-                fig2 = px.bar(
-                    monthly, x="month", y="teus",
-                    title="Monthly TEU Volume",
-                    color="teus",
-                    color_continuous_scale="Teal",
-                )
-                fig2.update_layout(
-                    template="plotly_dark",
-                    xaxis_title="Month", yaxis_title="Total TEUs",
-                    margin=dict(l=0, r=0, t=40, b=0),
-                    coloraxis_showscale=False,
-                )
-                st.plotly_chart(fig2, use_container_width=True)
+        with tab2:
+            monthly = df.groupby("month")["teus"].sum().reset_index()
+            fig2 = px.bar(
+                monthly, x="month", y="teus",
+                title="Monthly TEU Volume",
+                color="teus",
+                color_continuous_scale="Teal",
+            )
+            fig2.update_layout(
+                template="plotly_dark",
+                xaxis_title="Month", yaxis_title="Total TEUs",
+                margin=dict(l=0, r=0, t=40, b=0),
+                coloraxis_showscale=False,
+            )
+            st.plotly_chart(fig2, use_container_width=True)
 
-            with tab3:
-                day_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-                weekday = df.groupby("weekday")["teus"].mean().reindex(day_order).reset_index()
-                fig3 = px.bar(
-                    weekday, x="weekday", y="teus",
-                    title="Average TEUs by Weekday",
-                    color="teus",
-                    color_continuous_scale="Viridis",
-                )
-                fig3.update_layout(
-                    template="plotly_dark",
-                    xaxis_title="", yaxis_title="Avg TEUs",
-                    margin=dict(l=0, r=0, t=40, b=0),
-                    coloraxis_showscale=False,
-                )
-                st.plotly_chart(fig3, use_container_width=True)
+        with tab3:
+            day_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            weekday = df.groupby("weekday")["teus"].mean().reindex(day_order).reset_index()
+            fig3 = px.bar(
+                weekday, x="weekday", y="teus",
+                title="Average TEUs by Weekday",
+                color="teus",
+                color_continuous_scale="Viridis",
+            )
+            fig3.update_layout(
+                template="plotly_dark",
+                xaxis_title="", yaxis_title="Avg TEUs",
+                margin=dict(l=0, r=0, t=40, b=0),
+                coloraxis_showscale=False,
+            )
+            st.plotly_chart(fig3, use_container_width=True)
 
         # --- Summary Table ---
         with st.expander("\ud83d\udcca Data Summary"):
@@ -805,9 +805,9 @@ elif menu == "\ud83d\udd11\ufe0f Data Management":
         log_df = pd.read_sql("SELECT * FROM activity_log ORDER BY timestamp DESC LIMIT 50", conn)
         if log_df.empty:
             st.info("No activity recorded yet.")
-            else:
-                st.dataframe(log_df, use_container_width=True)
-                download_csv(log_df, "activity_log.csv")
+        else:
+            st.dataframe(log_df, use_container_width=True)
+            download_csv(log_df, "activity_log.csv")
 
 
 # ================= SYSTEM HEALTH =================
